@@ -5,13 +5,13 @@ import WeatherBlock from "./components/WeatherBlock";
 import HumidityWindBlock from "./components/HumidityBlock";
 import AdvisoryBlock from "./components/AdvisoryBlock";
 import Map from "./components/Map";
-import WeatherDataChart from "./components/WeatherDataChart";
-
-
 
 function App() {
   const [weatherData, setWeatherData] = useState(null);
+  const [position, setPosition] = useState(null);
+  const [advise, setAdvise] = useState(null);
   const [locationError, setLocationError] = useState(null);
+  
 
   useEffect(() => {
     // Function to fetch weather data from FastAPI backend
@@ -22,6 +22,21 @@ function App() {
         if (response.ok) {
           const data = await response.json();
           setWeatherData(data);
+
+          // check advise
+          const temperatureCelsius = Math.round(data.temperature - 273.15);
+          const humidity = data.humidity;
+          const wind_speed = data.wind_speed;
+
+          if (temperatureCelsius > 25) {
+            setAdvise("Irrigate crops!");
+          } else if (humidity > 60) {
+            setAdvise("Apply pesticides!");
+          } else if (wind_speed > 30) {
+            setAdvise("Protect crops!");
+          } else {
+            setAdvise("Crops are safe!");
+          }
         } else {
           console.error("Failed to fetch weather data");
         }
@@ -36,7 +51,8 @@ function App() {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const { latitude, longitude } = position.coords;
-            fetchWeatherData(latitude, longitude); // Fetch weather using the user's location
+            setPosition(position.coords);
+            fetchWeatherData(latitude, longitude);
           },
           (error) => {
             setLocationError("Unable to retrieve location. Please allow location access.");
@@ -48,7 +64,7 @@ function App() {
       }
     };
 
-    getLocation(); // Trigger location request when component mounts
+    getLocation();
   }, []);
 
   return (
@@ -57,7 +73,7 @@ function App() {
       {locationError && <p>{locationError}</p>}
       {weatherData ? (
         <div className="block-container">
-          <Map />
+          <Map lat={position.latitude} long={position.longitude} />
           <div className="small-block-container">
             <WeatherBlock 
               temperature={weatherData.temperature} 
@@ -68,12 +84,8 @@ function App() {
               wind={weatherData.wind_speed} 
             />
             <AdvisoryBlock
-              temperature={weatherData.temperature} 
-              weather={weatherData.weather} 
-              humidity={weatherData.humidity} 
-              wind={weatherData.wind_speed} 
+              advise={advise} 
             />
-            <WeatherDataChart />
             </div>
           </div>
       ) : (
