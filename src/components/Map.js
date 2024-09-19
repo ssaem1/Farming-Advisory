@@ -2,9 +2,8 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-const Map = () => {
-  // Set your initial center coordinates
-  const position = [49.2827, -123.1207]; // Vancouver, BC coordinates
+const Map = ({ lat, long }) => {
+  const position = [lat, long]; 
 
   return (
     <MapContainer

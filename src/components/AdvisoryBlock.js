@@ -1,13 +1,12 @@
-// HumidityWindBlock.js
 import React from "react";
-import './BlockStyles.css'; // Import the CSS for styling
+import './BlockStyles.css'; 
 
-function AdvisoryBlock({ temperature, weather, humidity, wind , }) {
+function AdvisoryBlock({ advise }) {
+
   return (
     <div className="block-advisory">
       <h2>Advisory</h2>
-      <p>Humidity: {humidity}%</p>
-      <p>Wind Speed: {wind} m/s</p>
+      <p>{advise}</p>
     </div>
   );
 }
